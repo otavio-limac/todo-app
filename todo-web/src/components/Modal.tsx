@@ -57,8 +57,9 @@ function Modal({ open, onOpenChange }: ModalProps) {
         </DialogHeader>
 
         <div className="flex flex-col gap-2 mt-4">
-          <label className="text-sm text-gray-300">Title</label>
+          <label htmlFor="title" className="text-sm text-gray-300">Title</label>
           <input
+            id="title"
             type="text"
             placeholder="Enter the task title"
             value={title}
@@ -69,8 +70,9 @@ function Modal({ open, onOpenChange }: ModalProps) {
         </div>
 
         <div className="flex flex-col gap-2 mt-4">
-          <label className="text-sm text-gray-300">Description</label>
+          <label htmlFor="description" className="text-sm text-gray-300">Description</label>
           <textarea
+            id="description"
             placeholder="Enter the task description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
