@@ -83,6 +83,7 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
+          cache-dependency-path: todo-web/package-lock.json
 
       - name: Install dependencies
         run: npm install
