@@ -55,7 +55,6 @@ public class TaskController {
             @PathVariable Long id,
             @RequestBody UpdateTaskData data) {
 
-        // Buscar a task no banco
         return repository.findById(id)
                 .map(task -> {
                     task.setTitle(data.title());
