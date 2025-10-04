@@ -3,7 +3,7 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 // page
-import Home from "./components/Home.tsx";
+import Home from "./pages/Home.tsx";
 
 function App() {
   return (
