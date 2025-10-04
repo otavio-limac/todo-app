@@ -1,10 +1,17 @@
+// dependencies
+
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+
+// page
+import Home from "./components/Home.tsx";
+
 function App() {
   return (
-    <>
-      <h1 className="text-3xl font-bold underline ">
-        Hello world!
-      </h1>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} index/>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
