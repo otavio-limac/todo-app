@@ -4,58 +4,74 @@ import Modal from "./Modal";
 import { vi } from "vitest";
 
 describe("Modal component", () => {
-  it("renders correctly when open", () => {
-    render(<Modal open={true} onOpenChange={vi.fn()} />);
-    expect(screen.getByText("Create new task")).toBeInTheDocument();
-    expect(screen.getByLabelText(/Title/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Create/i })).toBeInTheDocument();
-  });
+  const defaultProps = {
+    open: true,
+    onOpenChange: vi.fn(),
+    titleModal: "Create new task",
+    buttonText: "Create",
+  };
 
-  it("does not render when closed", () => {
-    render(<Modal open={false} onOpenChange={vi.fn()} />);
-    expect(screen.queryByText("Create new task")).not.toBeInTheDocument();
-  });
+  const editProps = {
+    ...defaultProps,
+    titleModal: "Edit task",
+    buttonText: "Save",
+  };
 
-  it("shows error messages when submitting empty form", async () => {
-    const user = userEvent.setup();
-    render(<Modal open={true} onOpenChange={vi.fn()} />);
+  const runCommonTests = (props: typeof defaultProps) => {
+    it(`renders correctly for title "${props.titleModal}"`, () => {
+      render(<Modal {...props} />);
+      expect(screen.getByText(props.titleModal)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Title/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: props.buttonText })).toBeInTheDocument();
+    });
 
-    const createButton = screen.getByRole("button", { name: /Create/i });
-    await user.click(createButton);
+    it(`does not render when closed for title "${props.titleModal}"`, () => {
+      render(<Modal {...props} open={false} />);
+      expect(screen.queryByText(props.titleModal)).not.toBeInTheDocument();
+    });
 
-    expect(await screen.findByText(/Title is required/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Description is required/i)).toBeInTheDocument();
-  });
+    it(`shows error messages when submitting empty form for title "${props.titleModal}"`, async () => {
+      const user = userEvent.setup();
+      render(<Modal {...props} />);
 
-  it("updates input values correctly", async () => {
-    const user = userEvent.setup();
-    render(<Modal open={true} onOpenChange={vi.fn()} />);
+      const mainButton = screen.getByRole("button", { name: props.buttonText });
+      await user.click(mainButton);
 
-    const titleInput = screen.getByPlaceholderText("Enter the task title");
-    const descInput = screen.getByPlaceholderText("Enter the task description");
+      expect(await screen.findByText(/Title is required/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Description is required/i)).toBeInTheDocument();
+    });
 
-    await user.type(titleInput, "Test Task");
-    await user.type(descInput, "This is a test description");
+    it(`updates input values correctly for title "${props.titleModal}"`, async () => {
+      const user = userEvent.setup();
+      render(<Modal {...props} />);
 
-    expect(titleInput).toHaveValue("Test Task");
-    expect(descInput).toHaveValue("This is a test description");
-  });
+      const titleInput = screen.getByPlaceholderText("Enter the task title");
+      const descInput = screen.getByPlaceholderText("Enter the task description");
 
-  it("clears inputs and errors when modal is closed", async () => {
-    const { rerender } = render(<Modal open={true} onOpenChange={vi.fn()} />);
+      await user.type(titleInput, "Test Task");
+      await user.type(descInput, "This is a test description");
 
-    // Type something
-    const titleInput = screen.getByPlaceholderText("Enter the task title");
-    await userEvent.type(titleInput, "Test Task");
+      expect(titleInput).toHaveValue("Test Task");
+      expect(descInput).toHaveValue("This is a test description");
+    });
 
-    // Close the modal
-    rerender(<Modal open={false} onOpenChange={vi.fn()} />);
+    it(`clears inputs and errors when modal is closed for title "${props.titleModal}"`, async () => {
+      const { rerender } = render(<Modal {...props} />);
 
-    // Open again to check if cleared
-    rerender(<Modal open={true} onOpenChange={vi.fn()} />);
-    expect(screen.getByPlaceholderText("Enter the task title")).toHaveValue("");
-    expect(screen.getByPlaceholderText("Enter the task description")).toHaveValue("");
-    expect(screen.queryByText(/is required/i)).not.toBeInTheDocument();
-  });
+      const titleInput = screen.getByPlaceholderText("Enter the task title");
+      await userEvent.type(titleInput, "Test Task");
+
+      rerender(<Modal {...props} open={false} />);
+      rerender(<Modal {...props} open={true} />);
+
+      expect(screen.getByPlaceholderText("Enter the task title")).toHaveValue("");
+      expect(screen.getByPlaceholderText("Enter the task description")).toHaveValue("");
+      expect(screen.queryByText(/is required/i)).not.toBeInTheDocument();
+    });
+  };
+
+  // roda os testes para ambos os casos
+  describe("Create Modal", () => runCommonTests(defaultProps));
+  describe("Edit Modal", () => runCommonTests(editProps));
 });
