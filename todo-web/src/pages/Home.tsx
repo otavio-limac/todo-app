@@ -10,7 +10,7 @@ function Home() {
   return (
     <>
       <div className="flex flex-col justify-center items-center w-full">
-        <h1 className="text-4xl font-bold text-[#F2F2F2] font-bold mt-8">My tasks</h1>
+        <h1 className="text-4xl text-[#F2F2F2] font-bold mt-8">My tasks</h1>
         <p className="text-[18px] text-[#BFBFBF] mt-2"><span className="text-[#595959]">Get started</span> and organize your tasks simply and efficiently</p>
       </div>
       <div className="flex justify-center items-center mt-4 gap-48">
@@ -36,7 +36,7 @@ function Home() {
       <div className="flex flex-col justify-center items-center mt-32">
         <p className="text-[#BFBFBF]">No tasks yet. Create your first one!</p>
       </div>
-      <Modal open={isOpen} onOpenChange={setIsOpen} />
+      <Modal open={isOpen} onOpenChange={setIsOpen} titleModal="Create new task" />
     </>
   )
 }

@@ -11,11 +11,12 @@ import { taskSchema } from "@/schemas/taskSchema";
 import type { ZodIssue } from "zod";
 
 interface ModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  titleModal: string
 }
 
-function Modal({ open, onOpenChange }: ModalProps) {
+function Modal({ open, onOpenChange, titleModal }: ModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState<{ title?: string; description?: string }>({});
@@ -53,7 +54,7 @@ function Modal({ open, onOpenChange }: ModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-[#121212] text-white rounded-lg w-[400px] p-6">
         <DialogHeader>
-          <DialogTitle>Create new task</DialogTitle>
+          <DialogTitle>{titleModal}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-2 mt-4">
