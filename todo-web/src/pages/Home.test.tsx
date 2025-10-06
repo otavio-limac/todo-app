@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Home from './Home'
+import { vi } from 'vitest'
 
 // Mock do Modal (se necessário)
 vi.mock('@/components/Modal.tsx', () => {
