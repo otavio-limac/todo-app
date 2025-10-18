@@ -14,9 +14,10 @@ interface ModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   titleModal: string
+  onCreate: (task: { title: string; description: string }) => void
 }
 
-function Modal({ open, onOpenChange, titleModal }: ModalProps) {
+function Modal({ open, onOpenChange, titleModal, onCreate }: ModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState<{ title?: string; description?: string }>({});
@@ -38,7 +39,7 @@ function Modal({ open, onOpenChange, titleModal }: ModalProps) {
     }
 
     setError({});
-    // logic of creating task here
+    onCreate({ title, description });
   };
 
   // Clean errors when modal is closed

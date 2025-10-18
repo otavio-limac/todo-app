@@ -118,3 +118,18 @@
     @apply bg-[#0D0D0D] text-foreground;
   }
 }
+
+html {
+    overflow-y: scroll;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: none;
+}

@@ -2,10 +2,21 @@ import {Button} from "@/components/ui/button.tsx";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {useState} from "react";
 import Modal from "@/components/Modal.tsx";
+import Task from "@/components/Task.tsx";
+
+interface TaskType {
+  title: string;
+  description: string;
+}
 
 function Home() {
-
   const [isOpen, setIsOpen] = useState(false)
+  const [tasks, setTasks] = useState<TaskType[]>([]);
+
+  const handleCreateTask = (newTask: TaskType) => {
+    setTasks((prev) => [...prev, newTask]);
+    setIsOpen(false);
+  };
 
   return (
     <>
@@ -33,10 +44,30 @@ function Home() {
         </ToggleGroup>
         <Button onClick={() => setIsOpen(true)} size="lg" variant="secondary">Add task</Button>
       </div>
-      <div className="flex flex-col justify-center items-center mt-32">
-        <p className="text-[#BFBFBF]">No tasks yet. Create your first one!</p>
+
+      <div className="flex flex-col">
+        {tasks.length === 0 ? (
+          <p className="text-[#BFBFBF] text-center mt-32">
+            No tasks yet. Create your first one!
+          </p>
+        ) : (
+          tasks.map((task, i) => (
+            <Task key={i} title={task.title} description={task.description} />
+          ))
+        )}
       </div>
-      <Modal open={isOpen} onOpenChange={setIsOpen} titleModal="Create new task" />
+
+
+      <Modal open={isOpen} onOpenChange={setIsOpen} titleModal="Create new task" onCreate={handleCreateTask} />
+
+      <div>
+        {tasks.map((task, i) => (
+          <div key={i}>
+            <h3>{task.title}</h3>
+            <p>{task.description}</p>
+          </div>
+        ))}
+      </div>
     </>
   )
 }
