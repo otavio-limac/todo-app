@@ -18,12 +18,21 @@ describe("Modal component", () => {
     vi.clearAllMocks();
   });
 
+  const clickPrimaryButton = async () => {
+    const user = userEvent.setup();
+    const button = screen.getAllByRole("button").find(
+      (btn) => btn.textContent === "Create" || btn.textContent === "Save"
+    );
+    if (!button) throw new Error("Primary button not found");
+    await user.click(button);
+  };
+
   it("renders correctly", () => {
     render(<Modal {...defaultProps} />);
     expect(screen.getByText(defaultProps.titleModal)).toBeInTheDocument();
     expect(screen.getByLabelText(/Title/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Create/i })).toBeInTheDocument();
+    expect(screen.getAllByRole("button").some(btn => btn.textContent === "Create" || btn.textContent === "Save")).toBe(true);
     expect(screen.getByRole("button", { name: /Cancel/i })).toBeInTheDocument();
   });
 
@@ -33,12 +42,8 @@ describe("Modal component", () => {
   });
 
   it("shows error messages when submitting empty form", async () => {
-    const user = userEvent.setup();
     render(<Modal {...defaultProps} />);
-
-    const createButton = screen.getByRole("button", { name: /Create/i });
-    await user.click(createButton);
-
+    await clickPrimaryButton();
     expect(await screen.findByText(/Title is required/i)).toBeInTheDocument();
     expect(await screen.findByText(/Description is required/i)).toBeInTheDocument();
   });
@@ -79,7 +84,7 @@ describe("Modal component", () => {
     await user.type(screen.getByPlaceholderText("Enter the task title"), "My Task");
     await user.type(screen.getByPlaceholderText("Enter the task description"), "My Description");
 
-    await user.click(screen.getByRole("button", { name: /Create/i }));
+    await clickPrimaryButton();
 
     expect(onCreateMock).toHaveBeenCalledWith({
       title: "My Task",
@@ -88,10 +93,8 @@ describe("Modal component", () => {
   });
 
   it("allows empty fields when requireAllFields is false", async () => {
-    const user = userEvent.setup();
     render(<Modal {...defaultProps} requireAllFields={false} />);
-
-    await user.click(screen.getByRole("button", { name: /Create/i }));
+    await clickPrimaryButton();
 
     expect(screen.queryByText(/required/i)).not.toBeInTheDocument();
     expect(onCreateMock).toHaveBeenCalledWith({ title: "", description: "" });
@@ -101,20 +104,16 @@ describe("Modal component", () => {
     const user = userEvent.setup();
     render(<Modal {...defaultProps} />);
 
-    await user.click(screen.getByRole("button", { name: /Create/i }));
+    await clickPrimaryButton();
     expect(await screen.findByText(/Title is required/i)).toBeInTheDocument();
 
     await user.type(screen.getByPlaceholderText("Enter the task title"), "Fixed Title");
-
     expect(screen.queryByText(/Title is required/i)).not.toBeInTheDocument();
   });
 
   it("does not call onCreate when validation fails", async () => {
-    const user = userEvent.setup();
     render(<Modal {...defaultProps} />);
-
-    await user.click(screen.getByRole("button", { name: /Create/i }));
-
+    await clickPrimaryButton();
     expect(onCreateMock).not.toHaveBeenCalled();
   });
 
@@ -123,7 +122,6 @@ describe("Modal component", () => {
     render(<Modal {...defaultProps} />);
 
     await user.click(screen.getByRole("button", { name: /Cancel/i }));
-
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
   });
 });

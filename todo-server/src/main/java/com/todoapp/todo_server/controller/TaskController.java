@@ -12,6 +12,7 @@ import java.util.List;
 
 import java.net.URI;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {

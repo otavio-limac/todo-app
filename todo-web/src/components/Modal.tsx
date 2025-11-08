@@ -8,20 +8,29 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { taskSchema } from "@/schemas/taskSchema";
-import {z, type ZodIssue} from "zod";
+import { z, type ZodIssue } from "zod";
 
 interface ModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  titleModal: string
-  onCreate: (task: { title: string; description: string }) => void
-  requireAllFields?: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  titleModal: string;
+  onCreate: (task: { title: string; description: string }) => void; // agora title e description são obrigatórios
+  requireAllFields?: boolean;
+  initialData?: { title?: string; description?: string }; // para edição
 }
 
-function Modal({ open, onOpenChange, titleModal, onCreate, requireAllFields = true }: ModalProps) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+function Modal({ open, onOpenChange, titleModal, onCreate, requireAllFields = true, initialData }: ModalProps) {
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [description, setDescription] = useState(initialData?.description || "");
   const [error, setError] = useState<{ title?: string; description?: string }>({});
+
+  useEffect(() => {
+    if (open) {
+      setTitle(initialData?.title || "");
+      setDescription(initialData?.description || "");
+      setError({});
+    }
+  }, [open, initialData]);
 
   const handleCreate = () => {
     const schema = requireAllFields
@@ -35,29 +44,19 @@ function Modal({ open, onOpenChange, titleModal, onCreate, requireAllFields = tr
 
     if (!result.success) {
       const fieldErrors: { title?: string; description?: string } = {};
-
       result.error.issues.forEach((issue: ZodIssue) => {
         const path = issue.path[0];
         if (path === "title") fieldErrors.title = issue.message;
         if (path === "description") fieldErrors.description = issue.message;
       });
-
       setError(fieldErrors);
       return;
     }
 
     setError({});
-    onCreate({ title, description });
-  };
 
-  // Clean errors when modal is closed
-  useEffect(() => {
-    if (!open) {
-      setError({});
-      setTitle("");
-      setDescription("");
-    }
-  }, [open]);
+    onCreate({ title: title!, description: description! });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -105,7 +104,7 @@ function Modal({ open, onOpenChange, titleModal, onCreate, requireAllFields = tr
           <DialogClose asChild>
             <Button variant="secondary" size="sm">Cancel</Button>
           </DialogClose>
-          <Button size="sm" onClick={handleCreate}>Create</Button>
+          <Button size="sm" onClick={handleCreate}>{requireAllFields ? "Create" : "Save"}</Button>
         </div>
       </DialogContent>
     </Dialog>

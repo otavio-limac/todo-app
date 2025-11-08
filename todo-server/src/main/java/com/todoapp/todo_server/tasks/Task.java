@@ -35,6 +35,6 @@ public class Task {
     public Task(PostTaskData data) {
         this.title = data.title();
         this.description = data.description();
-        this.active = true;
+        this.active = false;
     }
 }
