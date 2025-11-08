@@ -35,6 +35,7 @@ class TaskControllerTest {
         task.setId(1L);
         task.setTitle("Test Task");
         task.setDescription("Task description");
+        task.setActive(true);
 
         given(repository.findById(1L)).willReturn(Optional.of(task));
 
@@ -42,7 +43,8 @@ class TaskControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Test Task"))
-                .andExpect(jsonPath("$.description").value("Task description"));
+                .andExpect(jsonPath("$.description").value("Task description"))
+                .andExpect(jsonPath("$.active").value(true));
     }
 
     @Test
@@ -60,6 +62,7 @@ class TaskControllerTest {
         task.setId(1L);
         task.setTitle("Task 1");
         task.setDescription("Desc 1");
+        task.setActive(true);
 
         Page<Task> page = new PageImpl<>(List.of(task));
         given(repository.findAll(any(Pageable.class))).willReturn(page);
@@ -76,6 +79,7 @@ class TaskControllerTest {
         PostTaskData data = new PostTaskData("New Task", "Description");
         Task saved = new Task(data);
         saved.setId(1L);
+        saved.setActive(true);
 
         given(repository.save(any(Task.class))).willReturn(saved);
 
@@ -100,6 +104,7 @@ class TaskControllerTest {
         existing.setId(1L);
         existing.setTitle("Old");
         existing.setDescription("Old desc");
+        existing.setActive(true);
 
         given(repository.findById(1L)).willReturn(Optional.of(existing));
         given(repository.save(any(Task.class))).willReturn(existing);
@@ -129,6 +134,31 @@ class TaskControllerTest {
                                     "description": "Updated desc"
                                 }
                                 """))
+                .andExpect(status().isNotFound());
+    }
+
+    // ===================== PATCH /tasks/{id}/toggle =====================
+    @Test
+    void shouldToggleTaskActiveStatus() throws Exception {
+        Task task = new Task();
+        task.setId(1L);
+        task.setTitle("Toggle Task");
+        task.setDescription("To be toggled");
+        task.setActive(true);
+
+        given(repository.findById(1L)).willReturn(Optional.of(task));
+        given(repository.save(any(Task.class))).willReturn(task);
+
+        mockMvc.perform(patch("/tasks/1/toggle"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(false));
+    }
+
+    @Test
+    void shouldReturn404WhenTogglingNonExistingTask() throws Exception {
+        given(repository.findById(999L)).willReturn(Optional.empty());
+
+        mockMvc.perform(patch("/tasks/999/toggle"))
                 .andExpect(status().isNotFound());
     }
 

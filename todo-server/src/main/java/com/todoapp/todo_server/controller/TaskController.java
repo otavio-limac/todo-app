@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.util.List;
 
 import java.net.URI;
 
@@ -23,7 +24,8 @@ public class TaskController {
                 .map(task -> new GetTaskData(
                         task.getId(),
                         task.getTitle(),
-                        task.getDescription()
+                        task.getDescription(),
+                        task.isActive()
                 ));
 
         return ResponseEntity.ok(page);
@@ -32,7 +34,7 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<GetTaskData> getTaskById(@PathVariable Long id) {
         return repository.findById(id)
-                .map(task -> new GetTaskData(task.getId(), task.getTitle(), task.getDescription()))
+                .map(task -> new GetTaskData(task.getId(), task.getTitle(), task.getDescription(), task.isActive()))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -60,11 +62,34 @@ public class TaskController {
                     task.setTitle(data.title());
                     task.setDescription(data.description());
                     repository.save(task);
-                    return new GetTaskData(task.getId(), task.getTitle(), task.getDescription());
+                    return new GetTaskData(
+                            task.getId(),
+                            task.getTitle(),
+                            task.getDescription(),
+                            task.isActive()
+                    );
                 })
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PatchMapping("/{id}/toggle")
+    public ResponseEntity<GetTaskData> toggleTask(@PathVariable Long id) {
+        return repository.findById(id)
+                .map(task -> {
+                    task.setActive(!task.isActive());
+                    repository.save(task);
+                    return new GetTaskData(
+                            task.getId(),
+                            task.getTitle(),
+                            task.getDescription(),
+                            task.isActive()
+                    );
+                })
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
@@ -73,5 +98,35 @@ public class TaskController {
                     repository.deleteById(id);
                     return ResponseEntity.noContent().<Void>build();
                 }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<GetTaskData>> getActiveTasks() {
+        var tasks = repository.findByActiveTrue()
+                .stream()
+                .map(task -> new GetTaskData(
+                        task.getId(),
+                        task.getTitle(),
+                        task.getDescription(),
+                        task.isActive()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/completed")
+    public ResponseEntity<List<GetTaskData>> getCompletedTasks() {
+        var tasks = repository.findByActiveFalse()
+                .stream()
+                .map(task -> new GetTaskData(
+                        task.getId(),
+                        task.getTitle(),
+                        task.getDescription(),
+                        task.isActive()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(tasks);
     }
 }
