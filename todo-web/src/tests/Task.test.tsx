@@ -1,15 +1,26 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import { vi } from "vitest";
 import Task from "@/components/Task";
 
+const defaultTaskProps = {
+  id: 1,
+  title: "Test Task",
+  description: "Test description",
+  active: true,
+  onDelete: vi.fn(),
+  onEdit: vi.fn(),
+  onToggleActive: vi.fn(),
+};
+
 describe("Task component", () => {
-  it("renders title and description correctly", () => {
-    render(<Task title="Test Task" description="Test description" />);
+  it("renderiza título e descrição corretamente", () => {
+    render(<Task {...defaultTaskProps} />);
     expect(screen.getByText("Test Task")).toBeInTheDocument();
     expect(screen.getByText("Test description")).toBeInTheDocument();
   });
 
-  it("opens modal when edit button is clicked", () => {
-    render(<Task title="Edit Me" description="Editable task" />);
+  it("abre modal ao clicar no botão de editar", () => {
+    render(<Task {...defaultTaskProps} />);
 
     const editButton = screen.getByRole("button", { name: /edit/i });
     fireEvent.click(editButton);
@@ -17,8 +28,8 @@ describe("Task component", () => {
     expect(screen.getByText("Edit task")).toBeInTheDocument();
   });
 
-  it("renders delete button (trash icon)", () => {
-    render(<Task title="Task X" description="Description Y" />);
+  it("renderiza botão de deletar", () => {
+    render(<Task {...defaultTaskProps} />);
 
     const deleteButton = screen.getAllByRole("button")[1];
     expect(deleteButton).toBeInTheDocument();
