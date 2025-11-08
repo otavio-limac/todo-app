@@ -8,22 +8,30 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { taskSchema } from "@/schemas/taskSchema";
-import type { ZodIssue } from "zod";
+import {z, type ZodIssue} from "zod";
 
 interface ModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   titleModal: string
   onCreate: (task: { title: string; description: string }) => void
+  requireAllFields?: boolean
 }
 
-function Modal({ open, onOpenChange, titleModal, onCreate }: ModalProps) {
+function Modal({ open, onOpenChange, titleModal, onCreate, requireAllFields = true }: ModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState<{ title?: string; description?: string }>({});
 
   const handleCreate = () => {
-    const result = taskSchema.safeParse({ title, description });
+    const schema = requireAllFields
+      ? taskSchema
+      : z.object({
+        title: z.string().optional(),
+        description: z.string().optional(),
+      });
+
+    const result = schema.safeParse({ title, description });
 
     if (!result.success) {
       const fieldErrors: { title?: string; description?: string } = {};
@@ -65,7 +73,12 @@ function Modal({ open, onOpenChange, titleModal, onCreate }: ModalProps) {
             type="text"
             placeholder="Enter the task title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (error.title && e.target.value.trim() !== "") {
+                setError((prev) => ({ ...prev, title: undefined }));
+              }
+            }}
             className="w-full px-3 py-2 bg-[#1E1E1E] border border-[#2C2C2C] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
           />
           {error.title && <p className="text-red-500 text-sm">{error.title}</p>}
@@ -77,7 +90,12 @@ function Modal({ open, onOpenChange, titleModal, onCreate }: ModalProps) {
             id="description"
             placeholder="Enter the task description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              if (error.description && e.target.value.trim() !== "") {
+                setError((prev) => ({ ...prev, description: undefined }));
+              }
+            }}
             className="w-full px-3 py-2 bg-[#1E1E1E] border border-[#2C2C2C] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
           />
           {error.description && <p className="text-red-500 text-sm">{error.description}</p>}

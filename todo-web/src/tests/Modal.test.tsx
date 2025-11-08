@@ -14,6 +14,10 @@ describe("Modal component", () => {
     onCreate: onCreateMock,
   };
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("renders correctly", () => {
     render(<Modal {...defaultProps} />);
     expect(screen.getByText(defaultProps.titleModal)).toBeInTheDocument();
@@ -81,5 +85,45 @@ describe("Modal component", () => {
       title: "My Task",
       description: "My Description",
     });
+  });
+
+  it("allows empty fields when requireAllFields is false", async () => {
+    const user = userEvent.setup();
+    render(<Modal {...defaultProps} requireAllFields={false} />);
+
+    await user.click(screen.getByRole("button", { name: /Create/i }));
+
+    expect(screen.queryByText(/required/i)).not.toBeInTheDocument();
+    expect(onCreateMock).toHaveBeenCalledWith({ title: "", description: "" });
+  });
+
+  it("clears error message when user fixes input", async () => {
+    const user = userEvent.setup();
+    render(<Modal {...defaultProps} />);
+
+    await user.click(screen.getByRole("button", { name: /Create/i }));
+    expect(await screen.findByText(/Title is required/i)).toBeInTheDocument();
+
+    await user.type(screen.getByPlaceholderText("Enter the task title"), "Fixed Title");
+
+    expect(screen.queryByText(/Title is required/i)).not.toBeInTheDocument();
+  });
+
+  it("does not call onCreate when validation fails", async () => {
+    const user = userEvent.setup();
+    render(<Modal {...defaultProps} />);
+
+    await user.click(screen.getByRole("button", { name: /Create/i }));
+
+    expect(onCreateMock).not.toHaveBeenCalled();
+  });
+
+  it("calls onOpenChange when clicking Cancel", async () => {
+    const user = userEvent.setup();
+    render(<Modal {...defaultProps} />);
+
+    await user.click(screen.getByRole("button", { name: /Cancel/i }));
+
+    expect(onOpenChangeMock).toHaveBeenCalledWith(false);
   });
 });

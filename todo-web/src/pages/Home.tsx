@@ -57,8 +57,13 @@ function Home() {
         )}
       </div>
 
-
-      <Modal open={isOpen} onOpenChange={setIsOpen} titleModal="Create new task" onCreate={handleCreateTask} />
+      <Modal
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        titleModal="Create new task"
+        onCreate={handleCreateTask}
+        requireAllFields
+      />
 
       <div>
         {tasks.map((task, i) => (
