@@ -1,10 +1,10 @@
-# Todo-App 📝
+# Todo-App
 
 A **modern full-stack task management project** built with **React**, **TypeScript**, **Vite** on the front-end and **Java + Spring Boot** on the back-end, using **MySQL** as the database. The project features continuous integration via **GitHub Actions**.
 
 ---
 
-## 🚀 Technologies
+## Technologies
 
 - **Front-end:** React, TypeScript, Vite
 - **Back-end:** Java, Spring Boot
@@ -14,7 +14,7 @@ A **modern full-stack task management project** built with **React**, **TypeScri
 
 ---
 
-## 📦 Features
+## Features
 
 - Create new tasks with title and description.
 - Edit existing tasks.
@@ -28,7 +28,7 @@ A **modern full-stack task management project** built with **React**, **TypeScri
 
 ---
 
-## ⚡ Scripts (Front-end)
+## Scripts (Front-end)
 
 Navigate to the front-end folder:
 
@@ -62,7 +62,7 @@ vitest run
 
 ---
 
-## ⚡ Scripts (Back-end)
+## Scripts (Back-end)
 
 Navigate to the back-end folder:
 
@@ -84,7 +84,7 @@ Build and run tests:
 
 ---
 
-## 🗂 Folder Structure
+## Folder Structure
 
 ```
 TODO-APP/
